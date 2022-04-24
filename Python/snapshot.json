@@ -1,0 +1,18 @@
+{
+    "timestamp": 1650027655.2369444,
+    "devices": [
+        {
+            "ip": "192.168.0.14",
+            "gwId": "ebbd93fb5df057bf4dlaic",
+            "active": 2,
+            "ablilty": 0,
+            "encrypt": true,
+            "productKey": "key8k3dvn7qq4g5x",
+            "version": "3.3",
+            "name": "ebbd93fb5df057bf4dlaic",
+            "key": "",
+            "id": "ebbd93fb5df057bf4dlaic",
+            "ver": "3.3"
+        }
+    ]
+}
