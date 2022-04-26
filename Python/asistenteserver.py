@@ -161,4 +161,5 @@ def index():
     json_data = {"temp": average_temp, "hum": average_hum, "gas": average_gas, "mov": movementDetected}
     return render_template('index.html', json_data=json_data)
 
-app.run(host=str(get_ip()), port=5000, debug=True, use_reloader=False)
+def beginServer():
+    threading.Thread(target=lambda:app.run(host=str(get_ip()), port=5000, debug=True, use_reloader=False)).start()

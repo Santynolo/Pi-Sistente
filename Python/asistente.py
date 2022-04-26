@@ -11,7 +11,7 @@ from pydub.playback import _play_with_simpleaudio
 from flask import Flask, Response                                                       
 import threading
 import socket
-import queue
+import asistenteserver
 # obtain audio from the microphone
 r = sr.Recognizer()
 r.pause_threshold = 1
@@ -210,46 +210,11 @@ answersDir = {
     "encender todas las luces": lambda: allRoomLight(True),
     "ja": "de que te ries? ojala que no sea yo, porque no sabes de lo que soy capas"
 }
-# flask
-app = Flask(__name__)
-# 128kb compressed mp3 audio
-@app.route("/mp3_128")
-def streamMP3():
-    global curr_playing
-    if curr_playing == "":
-        return ""
-    def generate():
-        with open(curr_playing, "rb") as fmp3:
-            data = fmp3.read(1024)
-            while data:
-                yield data
-                data = fmp3.read(1024)
-    return Response(generate(), mimetype="audio/mp3")
-@app.route("/audio_status")
-def checkAudioStatus():
-    global curr_playing
-    if curr_playing == "":
-        return "0"
-    else:
-        return "1"
-
-def get_ip():
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.settimeout(0)
-    try:
-        # doesn't even have to be reachable
-        s.connect(('10.255.255.255', 1))
-        IP = s.getsockname()[0]
-    except Exception:
-        IP = '127.0.0.1'
-    finally:
-        s.close()
-    return IP
 
 if __name__ == "__main__":
-    
-    web = threading.Thread(target=lambda: app.run(host=str(get_ip()), port=5000, debug=True, use_reloader=False))
-    web.start()
+    asistenteserver.beginServer()
+    #web = threading.Thread(target=lambda: app.run(host=str(get_ip()), port=5000, debug=True, use_reloader=False))
+    #web.start()
     while True:
         if newCommandReceived[0] == True:
             msg = str(newCommandReceived[1])
