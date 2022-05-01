@@ -9,15 +9,15 @@ import time
 from pydub import AudioSegment
 from pydub.playback import _play_with_simpleaudio
 from flask import Flask, Response                                                       
-import threading
-import socket
+import os
+import socket, random
 import asistenteserver
 # obtain audio from the microphone
 r = sr.Recognizer()
 r.pause_threshold = 1
 newCommandReceived = [False, ""]
 isBusy = False
-alarm_file = "I_remixed_a_bunch_of_EAS_alarms.mp3"
+alarm_files = ["I_remixed_a_bunch_of_EAS_alarms2.wav", "I_remixed_a_bunch_of_EAS_alarms.mp3"]
 """  DEFINITIONS  """
 # speech
 def remove_accents(input_str):
@@ -55,7 +55,7 @@ def sayText(text, isblocking=True, speed = 160, pitch=50):
     global currEspeakCall
     if currEspeakCall != None:
         currEspeakCall.kill()
-    cmd_beg= f'espeak -g 5 -s {speed} -p {pitch} -a 200 -v es+m1 "'
+    cmd_beg= f'espeak -g 5 -s {speed} -p {pitch} -a 200 -v es+m1 -z "'
     cmd_end= '"' # To play back the stored .wav file and to dump the std errors to /dev/null
     sendToConsole(text)
     #Calls the Espeak TTS Engine to read aloud a Text
@@ -129,6 +129,7 @@ def co2Alert():
     sayText("ATENCION, ATENCION. SE A DETECTADO NIVELES", True)
     sayText("LETALES O PELIGROSOS", True, pitch=0)
     sayText("DE DIOXIDO DE CARBONO. POR FAVOR, EVACUE EL AREA Y BUSQUE ATENCION MEDICA INMEDIATA. ACTIVANDO SISTEMA DE VENTILACION.", True)
+    alarm_file = random.choice(alarm_files)
     alarmAudio = AudioSegment.from_file(alarm_file)
     alarmPlayback = None
     alarmPlayback = _play_with_simpleaudio(alarmAudio)
@@ -144,6 +145,7 @@ def securityAlert():
     sayText("ATENCION, ATENCION. SE A DETECTADO MOVIMIENTO EN PISO X SENSOR X", True)
     sayText("ACTIVANDO MEDIDAS DE SEGURIDAD", True, pitch=0)
     sayText("PELIGRO DE SEGURIDAD NIVEL: X", True)
+    alarm_file = random.choice(alarm_files)
     alarmAudio = AudioSegment.from_file(alarm_file)
     alarmPlayback = None
     alarmPlayback = _play_with_simpleaudio(alarmAudio)
@@ -237,7 +239,7 @@ if __name__ == "__main__":
                     break
             newCommandReceived[0] = False
         
-        if alarmPlaying == False and alarmPlayback != None:
+        if (alarmPlaying == False and alarmPlayback != None) or (alarmPlayback != None and alarmPlayback.is_playing() == False and alarmPlaying == True):
             alarmPlayback.stop()
             alarmPlayback = None
             curr_playing = ""
